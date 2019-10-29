@@ -19,6 +19,7 @@
 
 
 import bpy
+import bmesh
 from bpy.types import Panel, Operator, PropertyGroup, Scene
 from bpy.utils import register_class, unregister_class
 from bpy.props import FloatProperty, PointerProperty
@@ -41,7 +42,16 @@ def calc_bounds():
     bpy.ops.object.mode_set(mode='OBJECT')
 
     mesh = bpy.context.object.data
-    verts = [v for v in mesh.vertices if v.select]
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+
+    verts = [v for v in bm.verts if v.select]
+
+    for v in verts:
+      v.co = bpy.context.object.matrix_world @ v.co
+
+    bm.verts.ensure_lookup_table()
 
     # [+x, -x, +y, -y, +z, -z]
     v = verts[0].co
@@ -60,6 +70,8 @@ def calc_bounds():
             bounds[4] = v.co.z
         if bounds[5] > v.co.z:
             bounds[5] = v.co.z
+
+    bm.free()
 
     bpy.ops.object.mode_set(mode=mode)
 
