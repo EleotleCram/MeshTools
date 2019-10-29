@@ -28,7 +28,7 @@ bl_info = {
     "name": "Mesh Tools",
     "author": "Jake Dube",
     "version": (1, 0),
-    "blender": (2, 78, 0),
+    "blender": (2, 80, 0),
     "location": "View3D > Mesh > Transform > Set Dimensions",
     "description": "Sets dimensions for selected vertices.",
     "category": "Mesh"}
@@ -72,16 +72,16 @@ def safe_divide(a, b):
     return 1
 
 
-class SetDimensions(Operator):
+class MSHTLS_MT_SetDimensions(Operator):
     bl_label = "Set Dimensions"
     bl_idname = "view3d.set_dimensions_mt"
     bl_description = "Sets dimensions of selected vertices"
     bl_options = {'REGISTER', 'UNDO'}
     bl_context = "editmode"
 
-    new_x = FloatProperty(name="X", min=0, default=1, unit='LENGTH')
-    new_y = FloatProperty(name="Y", min=0, default=1, unit='LENGTH')
-    new_z = FloatProperty(name="Z", min=0, default=1, unit='LENGTH')
+    new_x : FloatProperty(name="X", min=0, default=1, unit='LENGTH')
+    new_y : FloatProperty(name="Y", min=0, default=1, unit='LENGTH')
+    new_z : FloatProperty(name="Z", min=0, default=1, unit='LENGTH')
 
     def invoke(self, context, event):
         bounds = calc_bounds()
@@ -104,26 +104,25 @@ class SetDimensions(Operator):
         layout = self.layout
 
         box = layout.box()
-        box.label("New dimensions:")
+        box.label(text="New dimensions:")
         box.prop(self, "new_x")
         box.prop(self, "new_y")
         box.prop(self, "new_z")
 
 
 def add_button(self, context):
-    self.layout.operator(SetDimensions.bl_idname, icon="PLUGIN")
+    self.layout.operator(MSHTLS_MT_SetDimensions.bl_idname, icon="PLUGIN")
 
 
 def register():
-    register_class(SetDimensions)
+    register_class(MSHTLS_MT_SetDimensions)
     bpy.types.VIEW3D_MT_transform.append(add_button)
 
 
 def unregister():
-    unregister_class(SetDimensions)
+    unregister_class(MSHTLS_MT_SetDimensions)
     bpy.types.VIEW3D_MT_transform.remove(add_button)
 
 
 if __name__ == "__main__":
     register()
-
