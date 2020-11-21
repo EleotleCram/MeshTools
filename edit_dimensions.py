@@ -228,9 +228,10 @@ classes = [
 
 bmeshes_from_edit_mesh = {}
 prev_select_history_len = 0
+prev_select_history_active = None
 handle = None
 def spaceview3d_draw_handler():
-    global prev_select_history_len
+    global prev_select_history_len, prev_select_history_active
     should_refresh = False
     context = bpy.context
     obj = context.object
@@ -242,7 +243,7 @@ def spaceview3d_draw_handler():
             bmeshes_from_edit_mesh.setdefault(m.name, bmesh.from_edit_mesh(m))
     else:
         bmeshes_from_edit_mesh.clear()
-        current_active = None
+        prev_select_history_active = None
         return
 
     mesh = obj.data
@@ -261,7 +262,11 @@ def spaceview3d_draw_handler():
 
         cur_select_history_len = len(selected_verts)
 
-        if should_refresh or prev_select_history_len != cur_select_history_len:
+        if (should_refresh or
+                prev_select_history_active != select_history.active or
+                prev_select_history_len != cur_select_history_len):
+
+            prev_select_history_active = select_history.active
             prev_select_history_len = cur_select_history_len
             bounds = calc_bounds_verts(selected_verts)
 
